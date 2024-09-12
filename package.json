@@ -1,0 +1,61 @@
+{
+    "name": "ts-cron",
+    "private": false,
+    "version": "1.1.0",
+    "type": "module",
+    "main": "./dist/index.umd.cjs",
+    "module": "./dist/index.js",
+    "license": "MIT",
+    "author": {
+        "name": "Hugo Attal",
+        "url": "https://twitter.com/HugoAttal"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/hugoattal/ts-cron.git"
+    },
+    "homepage": "https://github.com/hugoattal/ts-cron#readme",
+    "url": "https://github.com/hugoattal/ts-cron",
+    "bugs": {
+        "url": "https://github.com/hugoattal/ts-cron/issues"
+    },
+    "keywords": [
+        "cron",
+        "schedule"
+    ],
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "dev": "vite",
+        "build": "rimraf dist && vite build",
+        "build:safe": "tsc && vite build",
+        "preview": "vite preview",
+        "test": "vitest",
+        "dev:test": "vitest --ui"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "require": "./dist/index.umd.cjs",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist/**"
+    ],
+    "devDependencies": {
+        "@types/node": "^22.5.4",
+        "@typescript-eslint/eslint-plugin": "^8.5.0",
+        "@typescript-eslint/parser": "^8.5.0",
+        "@vitest/ui": "^2.1.0",
+        "eslint": "^9.10.0",
+        "eslint-import-resolver-alias": "^1.1.2",
+        "eslint-import-resolver-typescript": "^3.6.3",
+        "eslint-plugin-import": "^2.30.0",
+        "eslint-plugin-sort-keys-custom-order": "^2.1.0",
+        "rimraf": "^6.0.1",
+        "typescript": "^5.6.2",
+        "vite": "^5.4.4",
+        "vite-plugin-dts": "^4.2.1",
+        "vitest": "^2.1.0"
+    }
+}

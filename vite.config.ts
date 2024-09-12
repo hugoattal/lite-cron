@@ -8,12 +8,12 @@ const alias = {
 
 export default defineConfig({
     build: {
-        target: "esnext",
         lib: {
+            name: "lite-cron",
             entry: "src/index.ts",
-            fileName: "index",
-            name: "ts-cron"
-        }
+            fileName: "index"
+        },
+        target: "esnext"
     },
     plugins: [dts()],
     resolve: {

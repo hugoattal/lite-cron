@@ -1,11 +1,11 @@
-# TS-CRON
+# Lite-CRON
 Simple, lightweight, and dependency-free CRON library for TypeScript.
 
 Packaged size: `2.78 kB` | Gzipped size: `1.03 kB`
 
 ## Installation
 ```bash
-pnpm install ts-cron
+pnpm install lite-cron
 ```
 
 ## Supported formats
@@ -41,7 +41,7 @@ Every missing value is considered as `0`.
 ### Launch a job
 
 ```typescript
-import { Cron } from "ts-cron";
+import { Cron } from "lite-cron";
 
 const cron = new Cron({
     time: "0 0 0/6 * * *",
@@ -52,7 +52,7 @@ const cron = new Cron({
 ```
 
 ```typescript
-import { Cron } from "ts-cron";
+import { Cron } from "lite-cron";
 
 const cron = new Cron({
     time: "0 0 0/6 * * *",

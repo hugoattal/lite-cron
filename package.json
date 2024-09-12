@@ -1,5 +1,5 @@
 {
-    "name": "ts-cron",
+    "name": "lite-cron",
     "private": false,
     "version": "1.0.0",
     "type": "module",
@@ -12,12 +12,12 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/hugoattal/ts-cron.git"
+        "url": "https://github.com/hugoattal/lite-cron.git"
     },
-    "homepage": "https://github.com/hugoattal/ts-cron#readme",
-    "url": "https://github.com/hugoattal/ts-cron",
+    "homepage": "https://github.com/hugoattal/lite-cron#readme",
+    "url": "https://github.com/hugoattal/lite-cron",
     "bugs": {
-        "url": "https://github.com/hugoattal/ts-cron/issues"
+        "url": "https://github.com/hugoattal/lite-cron/issues"
     },
     "keywords": [
         "cron",

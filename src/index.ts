@@ -2,7 +2,7 @@ import { getNextDate } from "@/time.ts";
 import { wait } from "@/wait.ts";
 
 export type TCronOptions = {
-    onTick: () => void | Promise<void> | boolean | Promise<boolean>;
+    onTick: () => void | Promise<void>;
     time: string;
     timezone?: string;
 }
@@ -20,7 +20,7 @@ export class Cron {
     private async start() {
         const waitTime = this.getWaitTime();
         await wait(waitTime);
-        this.nextDate = new Date();
+        this.nextDate = new Date(Math.max(Date.now(), this.nextDate.getTime() + 1));
         await this.trigger();
     }
 
@@ -33,7 +33,7 @@ export class Cron {
             return;
         }
 
-        await this.options.onTick();
+        this.options.onTick()?.catch(console.error);
         await this.start();
     }
 

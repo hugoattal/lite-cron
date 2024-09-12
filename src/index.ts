@@ -38,8 +38,7 @@ export class Cron {
 
     private getWaitTime() {
         const nextDate = getNextDate(this.options.time, this.nextDate);
-        const currentTime = Date.now();
         const nextTime = nextDate.getTime();
-        return nextTime - currentTime;
+        return nextTime - Date.now();
     }
 }

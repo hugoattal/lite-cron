@@ -3,9 +3,10 @@ function parseCronPart(cronPart: string, min: number, max: number) {
         return Array.from({ length: max - min + 1 }, (_, i) => i + min);
     }
 
-    if (cronPart.startsWith("*/")) {
-        const step = Number(cronPart.slice(2));
-        return Array.from({ length: Math.floor((max - min) / step) + 1 }, (_, i) => min + i * step);
+    if (cronPart.includes("/")) {
+        const [base, step] = cronPart.split("/").map(Number);
+        const start = isNaN(base) ? min : base;
+        return Array.from({ length: Math.ceil((max - start + 1) / step) }, (_, i) => start + i * step);
     }
 
     if (cronPart.includes("-")) {

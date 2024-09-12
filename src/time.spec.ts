@@ -19,6 +19,24 @@ test("should be the next five seconds", () => {
     expect(nextDate.getTime()).toBe(5000);
 });
 
+test("should be the next five seconds with base 0", () => {
+    const nextDate = getNextDate("0/5 * * * * *", new Date(1));
+
+    expect(nextDate.getTime()).toBe(5000);
+});
+
+test("should be the next five seconds with base 2", () => {
+    const nextDate = getNextDate("2/5 * * * * *", new Date(1));
+
+    expect(nextDate.getTime()).toBe(2000);
+});
+
+test("should be the next five seconds with base 2 skipped", () => {
+    const nextDate = getNextDate("2/5 * * * * *", new Date(4000));
+
+    expect(nextDate.getTime()).toBe(7000);
+});
+
 test("should be the next three minutes", () => {
     const nextDate = getNextDate("* 3-5 * * * *", new Date(1));
 

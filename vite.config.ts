@@ -1,6 +1,6 @@
 import * as path from "path";
 import dts from "vite-plugin-dts";
-import { defineConfig, UserConfig } from "vite";
+import { defineConfig } from "vite";
 
 const alias = {
     "@": path.resolve(__dirname, "src")
@@ -12,7 +12,7 @@ export default defineConfig({
         lib: {
             entry: "src/index.ts",
             fileName: "index",
-            name: "hashplate"
+            name: "ts-cron"
         }
     },
     plugins: [dts()],

@@ -1,6 +1,7 @@
 # TS-CRON
 Simple, lightweight, and dependency-free CRON library for TypeScript.
 
+Packaged size: `2.78 kB` | Gzipped size: `1.03 kB`
 
 ## Installation
 ```bash

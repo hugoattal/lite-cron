@@ -20,7 +20,7 @@ function parseCronPart(cronPart: string, min: number, max: number) {
 export function getNextDate(cronTime: string, nextDate = new Date()) {
     const cronParts = cronTime.split(" ");
 
-    if (cronParts.length === 5) {
+    while (cronParts.length < 6) {
         cronParts.unshift("0");
     }
 

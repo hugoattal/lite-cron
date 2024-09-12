@@ -2,9 +2,8 @@ import { getNextDate } from "@/time.ts";
 import { wait } from "@/wait.ts";
 
 export type TCronOptions = {
-    onTick: () => void | Promise<void>;
+    job: () => void | Promise<void>;
     time: string;
-    timezone?: string;
 }
 
 export class Cron {
@@ -33,7 +32,7 @@ export class Cron {
             return;
         }
 
-        this.options.onTick()?.catch(console.error);
+        this.options.job()?.catch(console.error);
         await this.start();
     }
 

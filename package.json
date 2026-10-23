@@ -1,10 +1,9 @@
 {
     "name": "lite-cron",
     "private": false,
-    "version": "1.1.0",
+    "version": "2.0.0",
     "type": "module",
-    "main": "./dist/index.umd.cjs",
-    "module": "./dist/index.js",
+    "main": "./dist/index.js",
     "license": "MIT",
     "author": {
         "name": "Hugo Attal",
@@ -38,26 +37,22 @@
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "require": "./dist/index.umd.cjs",
-            "import": "./dist/index.js"
+            "default": "./dist/index.js"
         }
     },
     "files": [
         "dist/**"
     ],
     "devDependencies": {
-        "@types/node": "^22.5.4",
-        "@vitest/ui": "^2.1.0",
-        "eslint": "^9.10.0",
-        "eslint-import-resolver-typescript": "^3.6.3",
-        "eslint-plugin-import-x": "^4.2.1",
-        "eslint-plugin-promise": "^7.1.0",
-        "eslint-plugin-sort-keys-custom-order": "^2.1.0",
-        "rimraf": "^6.0.1",
-        "typescript": "^5.6.2",
-        "typescript-eslint": "^8.5.0",
-        "vite": "^5.4.4",
-        "vite-plugin-dts": "^4.2.1",
-        "vitest": "^2.1.0"
+        "@luna-park/eslint-config": "^1.4.4",
+        "@types/node": "^26.6.5",
+        "@vitest/ui": "^5.0.5",
+        "eslint": "^10.13.0",
+        "rimraf": "^6.1.3",
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.72.0",
+        "vite": "^8.3.5",
+        "vite-plugin-dts": "^5.1.2",
+        "vitest": "^5.0.5"
     }
 }

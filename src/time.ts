@@ -1,115 +1,149 @@
-function parseCronPart(cronPart: string, min: number, max: number) {
-    if (cronPart === "*") {
-        return Array.from({ length: max - min + 1 }, (_, i) => i + min);
+export type TCronSchedule = {
+    days: Set<number>;
+    hours: Set<number>;
+    matchAnyDay: boolean;
+    minutes: Set<number>;
+    months: Set<number>;
+    seconds: Set<number>;
+    weekdays: Set<number>;
+};
+
+const MAX_ITERATIONS = 100_000;
+const SECOND_MS = 1000;
+const MINUTE_MS = 60 * SECOND_MS;
+
+const CRON_ITEM_REGEX = /^(?:\*|(\d+)(?:-(\d+))?)(?:\/(\d+))?$/;
+
+function parseCronItem(item: string, min: number, max: number) {
+    const match = CRON_ITEM_REGEX.exec(item);
+    if (!match) {
+        throw new Error(`Invalid cron value "${ item }"`);
     }
 
-    if (cronPart.includes("/")) {
-        const [base, step] = cronPart.split("/").map(Number);
-        const start = isNaN(base) ? min : base;
-        return Array.from({ length: Math.ceil((max - start + 1) / step) }, (_, i) => start + i * step);
+    const [, startPart, endPart, stepPart] = match;
+    const start = startPart === undefined ? min : Number(startPart);
+    const end = endPart !== undefined ? Number(endPart) : startPart === undefined || stepPart !== undefined ? max : start;
+    const step = stepPart === undefined ? 1 : Number(stepPart);
+
+    if (start < min || end > max || end < start || step < 1) {
+        throw new Error(`Invalid cron value "${ item }"`);
     }
 
-    if (cronPart.includes("-")) {
-        const [start, end] = cronPart.split("-").map(Number);
-        return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    const values: Array<number> = [];
+    for (let value = start; value <= end; value += step) {
+        values.push(value);
     }
 
-    return cronPart.split(",").map(Number);
+    return values;
 }
 
+function parseCronPart(cronPart: string, min: number, max: number) {
+    return new Set(cronPart.split(",").flatMap((item) => parseCronItem(item, min, max)));
+}
 
-export function getNextDate(cronTime: string, nextDate = new Date()) {
-    const cronParts = cronTime.split(" ");
+export function parseCron(cronTime: string): TCronSchedule {
+    const cronParts = cronTime.trim().split(/\s+/);
+
+    if (cronParts[0] === "" || cronParts.length > 6) {
+        throw new Error(`Invalid cron expression "${ cronTime }"`);
+    }
 
     while (cronParts.length < 6) {
         cronParts.unshift("0");
     }
 
-    const seconds = parseCronPart(cronParts[0], 0, 59);
-    const minutes = parseCronPart(cronParts[1], 0, 59);
-    const hours = parseCronPart(cronParts[2], 0, 23);
-    const days = parseCronPart(cronParts[3], 1, 31);
-    const months = parseCronPart(cronParts[4], 1, 12);
-    const weekdays = parseCronPart(cronParts[5], 0, 6);
+    const weekdays = new Set([...parseCronPart(cronParts[5], 0, 7)].map((weekday) => (weekday % 7)));
 
-    let maxTry = 1024;
+    return {
+        days: parseCronPart(cronParts[3], 1, 31),
+        hours: parseCronPart(cronParts[2], 0, 23),
+        matchAnyDay: cronParts[3][0] !== "*" && cronParts[5][0] !== "*",
+        minutes: parseCronPart(cronParts[1], 0, 59),
+        months: parseCronPart(cronParts[4], 1, 12),
+        seconds: parseCronPart(cronParts[0], 0, 59),
+        weekdays
+    };
+}
 
-    if (nextDate.getMilliseconds() !== 0) {
-        nextDate.setMilliseconds(0);
-        nextDate.setSeconds(nextDate.getSeconds() + 1);
-    }
-
-    while (--maxTry > 0) {
-        const currentMonth = nextDate.getMonth() + 1;
-        if (!months.includes(currentMonth)) {
-            const nextMonth = months.find(month => month > currentMonth) ?? months[0];
-            if (nextMonth < currentMonth) {
-                nextDate.setFullYear(nextDate.getFullYear() + 1);
-            }
-            nextDate.setMonth(nextMonth);
-            nextDate.setDate(1);
-            nextDate.setHours(0);
-            nextDate.setMinutes(0);
-            nextDate.setSeconds(0);
-        }
-
-        const currentDay = nextDate.getDate();
-        if (!days.includes(currentDay)) {
-            const nextDay = days.find(day => day > currentDay) ?? days[0];
-            if (nextDay < currentDay) {
-                nextDate.setMonth(nextDate.getMonth() + 1);
-            }
-
-            nextDate.setDate(nextDay);
-            nextDate.setHours(0);
-            nextDate.setMinutes(0);
-            nextDate.setSeconds(0);
-        }
-
-        const currentHour = nextDate.getHours();
-        if (!hours.includes(currentHour)) {
-            const nextHour = hours.find(hour => hour > currentHour) ?? hours[0];
-            if (nextHour < currentHour) {
-                nextDate.setDate(nextDate.getDate() + 1);
-            }
-
-            nextDate.setHours(nextHour);
-            nextDate.setMinutes(0);
-            nextDate.setSeconds(0);
-        }
-
-        const currentMinute = nextDate.getMinutes();
-        if (!minutes.includes(currentMinute)) {
-            const nextMinute = minutes.find(minute => minute > currentMinute) ?? minutes[0];
-            if (nextMinute < currentMinute) {
-                nextDate.setHours(nextDate.getHours() + 1);
-            }
-
-            nextDate.setMinutes(nextMinute);
-            nextDate.setSeconds(0);
-        }
-
-        const currentSecond = nextDate.getSeconds();
-        if (!seconds.includes(currentSecond)) {
-            const nextSecond = seconds.find(second => second > currentSecond) ?? seconds[0];
-            if (nextSecond < currentSecond) {
-                nextDate.setMinutes(nextDate.getMinutes() + 1);
-            }
-
-            nextDate.setSeconds(nextSecond);
-        }
-
-        if (weekdays.includes(nextDate.getDay())) {
-            break;
-        }
-        else {
-            nextDate.setDate(nextDate.getDate() + 1);
+function findNext(values: Set<number>, current: number) {
+    let next: number | undefined;
+    for (const value of values) {
+        if (value > current && (next === undefined || value < next)) {
+            next = value;
         }
     }
+    return next;
+}
 
-    if (maxTry === 0) {
-        throw new Error("Unable to find a valid date within the given constraints.");
+type TDateField = "Date" | "Day" | "Hours" | "Minutes" | "Month" | "Seconds";
+
+function getField(date: Date, field: TDateField, utc: boolean) {
+    return date[`get${ utc ? "UTC" : "" }${ field }` as const]();
+}
+
+function setHourStart(date: Date, hour: number, utc: boolean) {
+    date[utc ? "setUTCHours" : "setHours"](hour, 0, 0);
+}
+
+function advance(date: Date, schedule: TCronSchedule, utc: boolean) {
+    const month = getField(date, "Month", utc);
+    if (!schedule.months.has(month + 1)) {
+        date[utc ? "setUTCMonth" : "setMonth"](month + 1, 1);
+        setHourStart(date, 0, utc);
+        return true;
     }
 
-    return nextDate;
+    const day = getField(date, "Date", utc);
+    const dayMatch = schedule.days.has(day);
+    const weekdayMatch = schedule.weekdays.has(getField(date, "Day", utc));
+    if (schedule.matchAnyDay ? !dayMatch && !weekdayMatch : !dayMatch || !weekdayMatch) {
+        date[utc ? "setUTCDate" : "setDate"](day + 1);
+        setHourStart(date, 0, utc);
+        return true;
+    }
+
+    const hour = getField(date, "Hours", utc);
+    if (!schedule.hours.has(hour)) {
+        setHourStart(date, findNext(schedule.hours, hour) ?? 24, utc);
+        return true;
+    }
+
+    const minute = getField(date, "Minutes", utc);
+    const second = getField(date, "Seconds", utc);
+    if (!schedule.minutes.has(minute)) {
+        const minuteDelta = (findNext(schedule.minutes, minute) ?? 60) - minute;
+        date.setTime(date.getTime() + minuteDelta * MINUTE_MS - second * SECOND_MS);
+        return true;
+    }
+
+    if (!schedule.seconds.has(second)) {
+        const secondDelta = (findNext(schedule.seconds, second) ?? 60) - second;
+        date.setTime(date.getTime() + secondDelta * SECOND_MS);
+        return true;
+    }
+
+    return false;
+}
+
+export type TNextDateOptions = {
+    utc?: boolean;
+};
+
+export function getNextDate(cron: string | TCronSchedule, fromDate = new Date(), options: TNextDateOptions = {}) {
+    const schedule = typeof cron === "string" ? parseCron(cron) : cron;
+    const nextDate = new Date(Math.ceil(fromDate.getTime() / SECOND_MS) * SECOND_MS);
+
+    for (let i = 0; i < MAX_ITERATIONS; i++) {
+        const previousTime = nextDate.getTime();
+
+        if (!advance(nextDate, schedule, options.utc ?? false)) {
+            return nextDate;
+        }
+
+        if (nextDate.getTime() <= previousTime) {
+            nextDate.setTime(previousTime + SECOND_MS);
+        }
+    }
+
+    throw new Error("Unable to find a valid date within the given constraints.");
 }
